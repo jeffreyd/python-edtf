@@ -20,6 +20,24 @@ SEASON_MONTHS_RANGE = EDTF.get('SEASON_MONTHS_RANGE', {
         # For simplicity, we assume it falls at the end of the year, esp since the
         # spec says that sort order goes spring > summer > autumn > winter
         24: [12, 12],
+        25: [3, 5],
+        26: [6, 8],
+        27: [9, 11],
+        28: [12, 12],
+        29: [9, 11],
+        # same here for summer in the southern hemisphere
+        30: [12, 12],
+        31: [3, 5],
+        32: [6, 8],
+        33: [1, 3],
+        34: [4, 6],
+        35: [7, 9],
+        36: [10, 12],
+        37: [1, 4],
+        38: [5, 8],
+        39: [9, 12],
+        40: [1, 6],
+        41: [7, 12]
     }
 )
 
@@ -30,10 +48,28 @@ SEASONS = EDTF.get('SEASONS', {
     22: "summer",
     23: "autumn",
     24: "winter",
+    25: "spring - northern hemisphere",
+    26: "summer - northern hemisphere",
+    27: "autumn - northern hemisphere",
+    28: "winter - northern hemisphere",
+    29: "spring - southern hemisphere",
+    30: "summer - southern hemisphere",
+    31: "autumn - southern hemisphere",
+    32: "winter - southern hemisphere",
+    33: "quarter 1",
+    34: "quarter 2",
+    35: "quarter 3",
+    36: "quarter 4",
+    37: "quadrimester 1",
+    38: "quadrimester 2",
+    39: "quadrimester 3",
+    40: "semestral 1",
+    41: "semestral 2",
 })
 INVERSE_SEASONS = EDTF.get('INVERSE_SEASONS', {v: k for k, v in SEASONS.items()})
 # also need to interpret `fall`
 INVERSE_SEASONS['fall'] = 23
+INVERSE_SEASONS['fall - southern hemisphere'] = 31
 
 # changing these will break tests
 PADDING_DAY_PRECISION = EDTF.get('PADDING_DAY_PRECISION', relativedelta(days=1))

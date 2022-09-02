@@ -5,7 +5,7 @@ from time import struct_time
 
 from edtf.parser.grammar import parse_edtf as parse
 from edtf.parser.parser_classes import EDTFObject, TIME_EMPTY_TIME, \
-    TIME_EMPTY_EXTRAS
+    TIME_EMPTY_EXTRAS, ExponentialYear
 from edtf.parser.edtf_exceptions import EDTFParseException
 
 # Example object types and attributes.
@@ -178,14 +178,37 @@ EXAMPLES = (
     ('2004-06-(01)~/2004-06-(20)~', '2004-06-01', '2004-06-20', '2004-05-31', '2004-06-21'),
     # The interval began on an unspecified day in June 2004.
     ('2004-06-uu/2004-07-03', '2004-06-01', '2004-07-03'),
+    # Year with Y prefix
+    # the year 2008
+    ('y2008', '2008-01-01', '2008-12-31', None, None, 'y2008'),
+    # Same with Y
+    ('Y2008', '2008-01-01', '2008-12-31', None, None, 'Y2008'),
     # Year Requiring More than Four Digits - Exponential Form
     # the year 170000000
-    ('y17e7', '170000000-01-01', '170000000-12-31'),
+    ('y17e7', '170000000-01-01', '170000000-12-31', None, None, 'y17e7'),
     # the year -170000000
-    ('y-17e7',  '-170000000-01-01', '-170000000-12-31'),
+    ('y-17e7',  '-170000000-01-01', '-170000000-12-31', None, None, 'y-17e7'),
+    # Same as above, with Y
+    # the year 170000000
+    ('Y17e7', '170000000-01-01', '170000000-12-31', None, None, 'Y17e7'),
+    # the year -170000000
+    ('Y-17e7',  '-170000000-01-01', '-170000000-12-31', None, None, 'Y-17e7'),
     # Some year between 171010000 and 171999999, estimated to be 171010000 ('p3' indicates a precision of 3 significant digits.)
     # TODO Not yet implemented, see https://github.com/ixc/python-edtf/issues/12
     # ('y17101e4p3', '171010000-01-01', '171999999-12-31'),
+    # Non-approximate seasons
+    # Autumn 2008
+    ('2008-23', '2008-09-01', '2008-11-30'),
+    # Northern hemisphere autumn 2008
+    ('2008-27', '2008-09-01', '2008-11-30'),
+    # Southern hemisphere autumn 2008
+    ('2008-31', '2008-03-01', '2008-05-31'),
+    # First quarter 1977
+    ('1977-33', '1977-01-01', '1977-03-31'),
+    # Second quadrimester 1932
+    ('1932-38', '1932-05-01', '1932-08-31'),
+    # First semestral 2012
+    ('2012-40', '2012-01-01', '2012-06-30'),
 )
 
 BAD_EXAMPLES = (
@@ -221,9 +244,15 @@ class TestParsing(unittest.TestCase):
             f = parse(i)
             sys.stdout.write(" => %s()\n" % type(f).__name__)
             self.assertIsInstance(f, EDTFObject)
-            self.assertEqual(str(f), o)
 
-            if len(e) == 5:
+            expected_str = str(f)
+            if len(e) == 6:
+                expected_lower_strict = e[1]
+                expected_upper_strict = e[2]
+                expected_lower_fuzzy = e[3] or e[1]
+                expected_upper_fuzzy = e[4] or e[2]
+                expected_str = e[5]
+            elif len(e) == 5:
                 expected_lower_strict = e[1]
                 expected_upper_strict = e[2]
                 expected_lower_fuzzy = e[3]
@@ -245,6 +274,8 @@ class TestParsing(unittest.TestCase):
                 expected_upper_fuzzy = e[1]
             if len(e) == 1:
                 continue
+
+            self.assertEqual(expected_str, o)
 
             def iso_to_struct_time(iso_date):
                 """ Convert YYYY-mm-dd date strings to time structs """

@@ -86,7 +86,7 @@ def apply_delta(op, time_struct, delta):
 class EDTFObject(object):
     """
     Object to attact to a parser to become instantiated when the parser
-    completes.
+    completes.)
     """
     parser = None
 
@@ -708,10 +708,11 @@ class Level2Interval(Level1Interval):
 
 
 class ExponentialYear(LongYear):
-    def __init__(self, base, exponent, precision=None):
+    def __init__(self, base, exponent, precision=None, upper_lower='upper'):
         self.base = base
         self.exponent = exponent
         self.precision = precision
+        self.upper_lower = upper_lower
 
     def _precise_year(self):
         return int(self.base) * 10 ** int(self.exponent)

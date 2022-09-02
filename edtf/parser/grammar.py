@@ -46,11 +46,12 @@ positiveYear = Word(nums, exact=4)
 negativeYear = NotAny(L("-0000")) + ("-" + positiveYear)
 
 year = Combine(positiveYear ^ negativeYear)("year")
+yPrefixYear = oneOf("y Y") + year
 
 yearMonth = year + "-" + month
 yearMonthDay = year + "-" + monthDay  # o hai iso date
 
-date = Combine(year ^ yearMonth ^ yearMonthDay)("date")
+date = Combine(yPrefixYear ^ year ^ yearMonth ^ yearMonthDay)("date")
 Date.set_parser(date)
 
 zoneOffsetHour = oneThru13
@@ -81,7 +82,7 @@ level0Expression = date ^ dateAndTime ^ l0Interval
 UASymbol = Combine(oneOf("? ~ ?~"))
 UA.set_parser(UASymbol)
 
-seasonNumber = oneOf("21 22 23 24")
+seasonNumber = oneOf("21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41")
 
 # (* *** Season (unqualified) *** *)
 season = year + "-" + seasonNumber("season")
@@ -227,7 +228,7 @@ seasonQualified = season + "^" + seasonQualifier
 
 # (* ** Long Year - Scientific Form ** *)
 positiveInteger = Combine(positiveDigit + ZeroOrMore(digit))
-longYearScientific = "y" + Combine(Optional("-") + positiveInteger)("base") + "e" + \
+longYearScientific = oneOf("y Y") + Combine(Optional("-") + positiveInteger)("base") + oneOf("e E") + \
     positiveInteger("exponent") + Optional("p" + positiveInteger("precision"))
 ExponentialYear.set_parser(longYearScientific)
 
